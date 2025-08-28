@@ -2,25 +2,29 @@
 # Simple web server to keep the Replit alive and provide basic status
 
 import os
-import asyncio
 import threading
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+
 class StatusHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        
+
         tz = ZoneInfo("Asia/Tashkent")
         current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-        
+
         # Check if bot token is configured
-        bot_token_status = "✅ Configured" if os.environ.get("BOT_TOKEN") else "❌ Missing"
-        openai_status = "✅ Configured" if os.environ.get("OPENAI_API_KEY") else "⚠️ Optional - using fallback responses"
-        
+        bot_token_status = "✅ Configured" if os.environ.get(
+            "BOT_TOKEN") else "❌ Missing"
+        openai_status = "✅ Configured" if os.environ.get(
+            "OPENAI_API_KEY") else "⚠️ Optional - using fallback responses"
+
         html = f"""
         <!DOCTYPE html>
         <html>
@@ -89,12 +93,13 @@ class StatusHandler(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-        
+
         self.wfile.write(html.encode())
-    
+
     def log_message(self, format, *args):
         # Suppress default logging
         pass
+
 
 def run_server():
     """Run the web server in a separate thread"""
@@ -102,17 +107,19 @@ def run_server():
     print("Web server running on http://0.0.0.0:5000")
     server.serve_forever()
 
+
 def start_web_server():
     """Start the web server in background thread"""
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
     return server_thread
 
+
 if __name__ == "__main__":
     start_web_server()
     # Keep the main thread alive
     try:
         while True:
-            asyncio.sleep(1)
+            time.sleep(1)
     except KeyboardInterrupt:
         print("Server stopped")
