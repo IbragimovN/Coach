@@ -4,6 +4,7 @@
 # Работает и без OpenAI (будут шаблонные советы). С OpenAI — ответы «как человек».
 
 import os
+import nest_asyncio
 import json
 import random
 import asyncio
@@ -333,9 +334,11 @@ async def main():
         schedule_for_chat(application, int(key))
 
     print(f"{BOT_NAME} is running with TZ Asia/Tashkent.")
-    await application.run_polling(close_loop=False)
+    await application.run_polling()
 
 if __name__ == "__main__":
+    # Apply nest_asyncio to allow running asyncio in environments with existing event loops
+    nest_asyncio.apply()
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
